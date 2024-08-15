@@ -4,7 +4,17 @@ import SQLinkAPI, { StringOrNumber } from './server/apis';
 import TododItem from './components/todo/TododItem';
 import AppHeader from './components/header/AppHeader';
 import {TodoInput} from './components/todo/TodoInput';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
+export const toastOptions: any = {
+  position: "top-center",
+  autoClose: 1500,
+  hideProgressBar: true,
+  theme: "light",
+  closeOnClick: false,
+  closeButton: false,
+}
 
 export interface ITaskItem {
   task_id: number
@@ -20,11 +30,9 @@ export interface ITaskItem {
 function App() {
 
   const [tasksList,setTasksList] = useState<ITaskItem[]>([]);
+  const sucessMessage = (message:string) => toast.success(message,toastOptions)
 
-  const [taskInput,setTaskInput] = useState({
-    task_title:'',
-    task_description: ''
-  })
+  const [editData,setEditData] = useState<any>({})
 
   const fetchTasks = async() => {
     let res = await SQLinkAPI.getDataFromSQL("Todos",`$select=task_id,task_title,task_description,task_status,created_at`)
@@ -36,21 +44,31 @@ function App() {
   },[]);
 
   const handleSubmitTask = async(data:Record<string,any>) => {
-    await SQLinkAPI.insertDataToSQL("Todos",data)
+    if(Object.keys(editData).length != 0){
+      await SQLinkAPI.updateDataToSQL("Todos",data,'task_id',data.task_id)
+      await sucessMessage("Task updated Successfully!!")
+      await fetchTasks();
+      setEditData({})
+    }else{
+      await SQLinkAPI.insertDataToSQL("Todos",data)
+      await sucessMessage("Task created Successfully!!")
+      await fetchTasks()
+    }
+  }
+
+  const handleDelete = async(data:ITaskItem) => {
+    await SQLinkAPI.deleteDataToSQL("Todos",'task_id',data.task_id)
+    await sucessMessage("Task Deleted Successfully!!")
     await fetchTasks()
   }
 
-  const handleDelete = async(key:StringOrNumber,value:StringOrNumber) => {
-    await SQLinkAPI.deleteDataToSQL("Todos",key,value)
-    await fetchTasks()
-  }
-
-  const handleUpdate = async(key:StringOrNumber,value:StringOrNumber) => {
-    await SQLinkAPI.updateDataToSQL("Todos",{task_description: Date.now().toString()},key,value)
-    await fetchTasks()
+  const onUpdateClick = (item:ITaskItem) => {
+    let {task_title,task_description,task_id} = item
+    setEditData({task_title,task_description,task_id})
   }
   const handleOnClose = async() => {
     await fetchTasks();
+    setEditData({});
   }
 
   const handleStatusChange = async (status:string) => {
@@ -61,21 +79,22 @@ function App() {
       await fetchTasks();
     }
   }
+
+  const toggleStatus = async(data:ITaskItem) => {
+    let updated_status = data.task_status == "pending" ? "completed" : "pending"
+    await SQLinkAPI.updateDataToSQL("Todos",{task_status:updated_status},'task_id',data.task_id)
+    await sucessMessage("Task updated Successfully!!")
+    await fetchTasks();
+  }
+
   return (
     <>
       <AppHeader/>
-      <TodoInput onClose={handleOnClose} onTaskSubmit={handleSubmitTask} onStatusChange={handleStatusChange}/>
+      <TodoInput editData={editData} onClose={handleOnClose} onTaskSubmit={handleSubmitTask} onStatusChange={handleStatusChange}/>
       {
         tasksList.map((item) => {
           return (
-            // <div style={{display:'flex',gap:'40px'}}>
-            //   <p>{item.task_title}</p>
-            //   <p>{item.task_description}</p>
-            //   <a onClick={() => handleUpdate('task_id',item.task_id)}>Update</a>
-            //   <a onClick={() => handleDelete('task_id',item.task_id)}>Delete</a>
-
-            // </div>
-            <TododItem data={item}/>
+            <TododItem data={item} onDeleteItem={handleDelete} onUpdateItem={onUpdateClick} handleToggleStatus={toggleStatus}/>
           )
         })
       }

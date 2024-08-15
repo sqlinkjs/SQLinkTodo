@@ -1,8 +1,10 @@
 
 export type StringOrNumber = string | number
 
-class SQLinkAPIsClass {
+const BASE_URL = 'http://localhost:3001/table'
 
+
+class SQLinkAPIsClass {
 
     /**
      * @param tableName takes tablename for your database
@@ -11,13 +13,13 @@ class SQLinkAPIsClass {
      * 
      */
     async getDataFromSQL(tableName:string,queryParameters:string){
-        let q = await fetch(`http://localhost:3000/table/${tableName}/read?${queryParameters}&$orderby=created_at desc`)
+        let q = await fetch(`${BASE_URL}/${tableName}/read?${queryParameters}&$orderby=created_at desc`)
         let q_res = await q.json()
         return q_res
     }
 
     async updateDataToSQL(tableName:string,payloadData:Record<any,any>,updateKey:StringOrNumber,updateValue:StringOrNumber){
-        let q = await fetch(`http://localhost:3000/table/${tableName}/update(${updateKey},${updateValue})`,{
+        let q = await fetch(`${BASE_URL}/${tableName}/update(${updateKey},${updateValue})`,{
             method:'PUT',
             headers:{
                 "Content-type":"application/json"
@@ -30,7 +32,7 @@ class SQLinkAPIsClass {
 
 
     async insertDataToSQL(tableName:string,payloadData:Record<any,any>){
-        let q = await fetch(`http://localhost:3000/table/${tableName}/create`,{
+        let q = await fetch(`${BASE_URL}/${tableName}/create`,{
             method:'POST',
             headers:{
                 "Content-type":"application/json"
@@ -42,7 +44,7 @@ class SQLinkAPIsClass {
     }
 
     async deleteDataToSQL(tableName:string,deleteKey:StringOrNumber,deleteValue:StringOrNumber){
-        let q = await fetch(`http://localhost:3000/table/${tableName}/delete(${deleteKey},${deleteValue})`,{
+        let q = await fetch(`${BASE_URL}/${tableName}/delete(${deleteKey},${deleteValue})`,{
             method:'DELETE',
             headers:{
                 "Content-type":"application/json"

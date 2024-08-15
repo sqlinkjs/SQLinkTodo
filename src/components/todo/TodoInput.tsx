@@ -17,13 +17,20 @@ import {
 
 
 
-export function TodoInput({ onClose, onTaskSubmit, onStatusChange }: any) {
+export function TodoInput({ onClose, onTaskSubmit, onStatusChange, editData }: any) {
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
     const [status, setStatus] = useState<string>("all")
     const [taskInput, setTaskInput] = useState({
         task_title: '',
         task_description: ''
     });
+
+    useEffect(() => {
+        if(Object.keys(editData).length != 0){
+            setTaskInput(editData);
+            setIsModalOpen(true)
+        }
+    },[editData])
 
     const onFormSubmit = () => {
         onTaskSubmit(taskInput);
@@ -77,7 +84,7 @@ export function TodoInput({ onClose, onTaskSubmit, onStatusChange }: any) {
                     <Modal isOpen={isModalOpen} onClose={handleModalClose}>
                         <ModalOverlay />
                         <ModalContent>
-                            <ModalHeader>Add Task</ModalHeader>
+                            <ModalHeader>{Object.keys(editData).length != 0 ? "Edit Task" : "Add Task"}</ModalHeader>
                             <ModalCloseButton />
                             <ModalBody>
                                 <Stack gap={5}>
