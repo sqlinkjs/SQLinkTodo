@@ -21,6 +21,8 @@ export interface ITaskItem {
   task_title: string
   task_description: string
   task_status: string
+  attachment_name: string
+  attachment_url:string
   created_at:string | Date
   updated_at: string | Date
 }
@@ -35,7 +37,7 @@ function App() {
   const [editData,setEditData] = useState<any>({})
 
   const fetchTasks = async() => {
-    let res = await SQLinkAPI.getDataFromSQL("Todos",`$select=task_id,task_title,task_description,task_status,created_at`)
+    let res = await SQLinkAPI.getDataFromSQL("Todos",`$select=task_id,task_title,task_description,task_status,attachment_url,attachment_name,created_at`)
     setTasksList(res.data)
   }
 

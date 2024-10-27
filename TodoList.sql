@@ -5,6 +5,8 @@ CREATE TABLE Todos (
     task_title VARCHAR(255) NOT NULL,
     task_description TEXT,
     task_status ENUM('pending', 'completed') DEFAULT 'pending',
+    attachment_name TEXT,
+    attachment_url TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );

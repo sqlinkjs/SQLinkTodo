@@ -2,7 +2,7 @@
 export type StringOrNumber = string | number
 
 const BASE_URL = 'http://localhost:3001/table'
-
+export const UPLOAD_FILE_URL = "http://localhost:3001/upload"
 
 class SQLinkAPIsClass {
 
