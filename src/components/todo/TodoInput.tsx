@@ -44,7 +44,7 @@ export function TodoInput({
     if(file){
         const formData = new FormData();
         formData.append('files', file);
-        const response: Record<string,any> = await  axios.post('http://localhost:3001/upload', formData, {
+        const response: Record<string,any> = await  axios.post(UPLOAD_FILE_URL, formData, {
             headers: {
               'Content-Type': 'multipart/form-data',
             },
